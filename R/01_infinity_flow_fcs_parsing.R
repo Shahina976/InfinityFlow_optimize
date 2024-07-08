@@ -15,7 +15,7 @@ subsample_data <- function(
                         name_of_PE_parameter,
                         verbose=TRUE
                         ){
-    ## Subsampling  aaaaa
+    ## Subsampling
     if(verbose){
         message("Parsing and subsampling input data")
         message("\tDownsampling to ",input_events_downsampling," events per input file")
