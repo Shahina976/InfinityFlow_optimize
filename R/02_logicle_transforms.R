@@ -29,13 +29,23 @@ logicle_transform_input <- function(
         message("\tBackbone data")
     }
     
-    col_names <- c(
+    chans <- make.names(chans)
+    # col_names <- c(
+    #   "FSC-A", "FSC-H", "FSC-W", "SSC-A", "SSC-H", "SSC-W",
+    #   "CD69-CD301b", "Zombie", "MHCII", "CD4", "CD44", "CD8",
+    #   "CD11c", "CD11b", "F480", "Ly6C", "Lineage", "CD45a488",
+    #   "FJComp-PE(yg)-A", "CD24", "CD103", "Time"
+    # )
+    
+    colnames(xp) <- c(
       "FSC-A", "FSC-H", "FSC-W", "SSC-A", "SSC-H", "SSC-W",
       "CD69-CD301b", "Zombie", "MHCII", "CD4", "CD44", "CD8",
       "CD11c", "CD11b", "F480", "Ly6C", "Lineage", "CD45a488",
       "FJComp-PE(yg)-A", "CD24", "CD103", "Time"
     )
-    colnames(xp) <- make.names(col_names)
+    
+    
+    # colnames(xp) <- make.names(col_names)
     
     transforms_chan <- setNames(
         lapply(
