@@ -71,7 +71,7 @@ subsample_data <- function(
     )
     # saveRDS(xp,file=file.path(paths["rds"],"xp.Rds"))
 
-    xp_h5_path <- file.path(paths["rds"], "xp_transformed_scaled.h5")
+    xp_h5_path <- file.path(paths["rds"], "xp.h5")
     h5write(xp, xp_h5_path, "/xp")
     
     saveRDS(events.code,file=file.path(paths["rds"],"pe.Rds"))
