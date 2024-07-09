@@ -14,7 +14,7 @@
 logicle_transform_input <- function(
                                  yvar,
                                  paths,
-                                 xp=readRDS(file.path(paths["rds"],"xp.Rds")),
+                                 xp=h5read(file.path(paths["rds"],"xp.h5"), "/xp"),
                                  chans=readRDS(file.path(paths["rds"],"chans.Rds")),
                                  events.code=readRDS(file.path(paths["rds"],"pe.Rds")),
                                  annot=read.table(paths["annotation"],sep=",",header=TRUE,stringsAsFactors=FALSE),
@@ -28,6 +28,14 @@ logicle_transform_input <- function(
         message("Logicle-transforming the data")
         message("\tBackbone data")
     }
+    
+    col_names <- c(
+      "FSC-A", "FSC-H", "FSC-W", "SSC-A", "SSC-H", "SSC-W",
+      "CD69-CD301b", "Zombie", "MHCII", "CD4", "CD44", "CD8",
+      "CD11c", "CD11b", "F480", "Ly6C", "Lineage", "CD45a488",
+      "FJComp-PE(yg)-A", "CD24", "CD103", "Time"
+    )
+    colnames(xp) <- make.names(col_names)
     
     transforms_chan <- setNames(
         lapply(
@@ -94,6 +102,9 @@ logicle_transform_input <- function(
         message("\tWriting to disk")
     }
     
-    saveRDS(xp,file=file.path(paths["rds"],"xp_transformed.Rds"))
+    # saveRDS(xp,file=file.path(paths["rds"],"xp_transformed.Rds"))
+    xp_h5_path <- file.path(paths["rds"], "xp_transformed.h5")
+    h5write(xp, xp_h5_path, "/xp")
+    
     invisible()
 }
