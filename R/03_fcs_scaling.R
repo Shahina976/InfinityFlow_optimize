@@ -11,7 +11,7 @@ standardize_backbone_data_across_wells <- function(
                                                 yvar,
                                                 paths,
                                                 scale_function=function(x){scale(x,center=TRUE,scale=TRUE)},
-                                                xp=readRDS(file.path(paths["rds"],"xp_transformed.Rds")),
+                                                xp=h5read(file.path(paths["rds"],"xp_transformed.h5"), "/xp"),
                                                 chans=readRDS(file.path(paths["rds"],"chans.Rds")),
                                                 events.code=readRDS(file.path(paths["rds"],"pe.Rds")),
                                                 verbose=TRUE
@@ -20,6 +20,13 @@ standardize_backbone_data_across_wells <- function(
         message("Harmonizing backbone data")
         message("\tScaling expression matrices")
     }
+    
+    colnames(xp) <- c(
+      "FSC-A", "FSC-H", "FSC-W", "SSC-A", "SSC-H", "SSC-W",
+      "CD69-CD301b", "Zombie", "MHCII", "CD4", "CD44", "CD8",
+      "CD11c", "CD11b", "F480", "Ly6C", "Lineage", "CD45a488",
+      "FJComp-PE(yg)-A", "CD24", "CD103", "Time"
+    )
     
     xp <- split(as.data.frame(xp),events.code)
     xp <- lapply(xp,as.matrix)
@@ -33,6 +40,9 @@ standardize_backbone_data_across_wells <- function(
         message("\tWriting to disk")
     }    
     
-    saveRDS(xp,file=file.path(paths["rds"],"xp_transformed_scaled.Rds"))
+    # saveRDS(xp,file=file.path(paths["rds"],"xp_transformed_scaled.Rds"))
+    xp_h5_path <- file.path(paths["rds"], "xp_transformed_scaled.h5")
+    h5write(xp, xp_h5_path, "/xp")
+    
     invisible()
 }
