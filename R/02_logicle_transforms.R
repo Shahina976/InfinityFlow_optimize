@@ -29,7 +29,7 @@ logicle_transform_input <- function(
         message("\tBackbone data")
     }
     
-    chans <- make.names(chans)
+    # chans <- make.names(chans)
     # col_names <- c(
     #   "FSC-A", "FSC-H", "FSC-W", "SSC-A", "SSC-H", "SSC-W",
     #   "CD69-CD301b", "Zombie", "MHCII", "CD4", "CD44", "CD8",
