@@ -20,43 +20,39 @@ subsample_data <- function(
         message("Parsing and subsampling input data")
         message("\tDownsampling to ",input_events_downsampling," events per input file")
     }
-    files <- list.files(paths["input"],full.names=TRUE,recursive=TRUE,pattern=".fcs")
-    invisible(
-        lapply(
-            files,
-            function(file){
-                res <- do.call(read.FCS,c(list(filename=file),extra_args_read_FCS))
-                w <- sort(sample(seq_len(nrow(res)),min(input_events_downsampling,nrow(res))))
-                res <- res[w,]
-                write.FCS(res,file.path(paths["subset"],basename(file)))
-            }
-        )
-    )
+  
+  files <- list.files(paths["input"], full.names = TRUE, recursive = TRUE, pattern = ".fcs")
+  
+  for (file in files) {
+    res <- do.call(read.FCS, c(list(filename = file), extra_args_read_FCS))
+    w <- sort(sample(seq_len(nrow(res)), min(input_events_downsampling, nrow(res))))
+    res <- res[w, ]
+    write.FCS(res, file.path(paths["subset"], basename(file)))
+  }
+  
 
-    ## convert to .Rds
-    if(verbose){
-        message("\tConcatenating expression matrices")
-    }
-    files <- list.files(paths["subset"],full.names=TRUE,recursive=FALSE,include.dirs=FALSE,pattern=".fcs")
-    ns <- setNames(integer(length(files)),files)
-    xp <- lapply(
-        files,
-        function(file){
-            xp <- do.call(read.FCS,c(list(filename=file),extra_args_read_FCS))
-            annot <- pData(xp@parameters)
-            ## ns[file]<<-nrow(xp)
-            xp <- exprs(xp)
-            targets <- annot$desc
-            targets[is.na(targets)] <- annot$name[is.na(targets)]
-            colnames(xp)[colnames(xp)!=name_of_PE_parameter] <- targets[colnames(xp)!=name_of_PE_parameter]
-            colnames(xp)[colnames(xp)==name_of_PE_parameter] <- name_of_PE_parameter
-            xp
-        }
-    )
-    names(xp) <- files
-    ns <- vapply(xp, nrow, 1L)
-    xp <- do.call(rbind,xp)
-
+  ## convert to .Rds
+  files <- list.files(paths["subset"], full.names = TRUE, recursive = FALSE, include.dirs = FALSE, pattern = ".fcs")
+  
+  xp_list <- vector("list", length(files))
+  ns <- integer(length(files))
+  
+  for (i in seq_along(files)) {
+    file <- files[i]
+    xp <- do.call(read.FCS, c(list(filename = file), extra_args_read_FCS))
+    annot <- pData(xp@parameters)
+    xp <- exprs(xp)
+    targets <- annot$desc
+    targets[is.na(targets)] <- annot$name[is.na(targets)]
+    colnames(xp)[colnames(xp) != name_of_PE_parameter] <- targets[colnames(xp) != name_of_PE_parameter]
+    colnames(xp)[colnames(xp) == name_of_PE_parameter] <- name_of_PE_parameter
+    xp_list[[i]] <- xp
+    ns[i] <- nrow(xp)
+  }
+  
+  xp <- do.call(rbind, xp_list)
+  names(ns) <- files
+  
     ## Map which events originate from which file.
     if(verbose){
         message("\tWriting to disk")
@@ -71,9 +67,9 @@ subsample_data <- function(
     )
     # saveRDS(xp,file=file.path(paths["rds"],"xp.Rds"))
 
-    xp_h5_path <- file.path(paths["rds"], "xp.h5")
+    xp_h5_path <- file.path(paths["rds"], "xp_v1.h5")
     h5write(xp, xp_h5_path, "/xp")
     
-    saveRDS(events.code,file=file.path(paths["rds"],"pe.Rds"))
+    saveRDS(events.code,file=file.path(paths["rds"],"pe_v1.Rds"))
     invisible()
 }
