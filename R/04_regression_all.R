@@ -475,7 +475,10 @@ predict_from_models <- function(
   if(verbose){
     message("\tWriting to disk")
   }
-  saveRDS(preds,file=file.path(paths["rds"],"predictions.Rds"))
+  # saveRDS(preds,file=file.path(paths["rds"],"predictions.Rds"))
+  pred_h5_path <- file.path(paths["rds"], "predictions.h5")
+  h5write(preds, pred_h5_path, "/pred")
+  
   saveRDS(pred_set,file=file.path(paths["rds"],"sampling_preds.Rds"))   
   
   
