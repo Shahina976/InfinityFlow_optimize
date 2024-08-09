@@ -29,7 +29,6 @@ fitter_svm <- function(x = NULL, params = NULL){
 #' @return A list with two elements: predictions and a fitted model
 #' @examples
 #' fitter_xgboost()
-
 fitter_xgboost <- function(x = NULL, params = NULL){
   if(!requireNamespace("xgboost", quietly = TRUE)){
     stop("Please run install.packages(\"xgboost\")")
@@ -44,7 +43,6 @@ fitter_xgboost <- function(x = NULL, params = NULL){
     return(list(pred=pred,model=model))
   }
 }
-
 
 #' Wrapper to linear model training. Defined separetely to avoid passing too many objects in parLapplyLB
 #' @param x passed from fit_regressions
@@ -249,7 +247,7 @@ fit_regressions2 <- function(
   if(verbose){
     message("\tRandomly selecting 50% of the subsetted input files to fit models")
   }
-
+  
   col_names <- c(
     "FSC-A", "FSC-H", "FSC-W", "SSC-A", "SSC-H", "SSC-W",
     "CD69-CD301b", "Zombie", "MHCII", "CD4", "CD44", "CD8",
@@ -259,7 +257,7 @@ fit_regressions2 <- function(
   
   colnames(xp) <- make.names(col_names)
   
-
+  
   fcs_files <- unique(events.code) 
   
   
@@ -273,7 +271,7 @@ fit_regressions2 <- function(
     list(nrounds = 500, eta=0.05)
   )
   
-
+  
   ## Test avec fonction FUN 
   models <- list()  # Initialisation d'1 liste pour stocker les modèles
   timings <- numeric()
@@ -325,7 +323,7 @@ fit_regressions2 <- function(
     {
       chans <- make.names(chans)
       yvar <- make.names(yvar)
-
+      
     }
   )
   
@@ -354,6 +352,12 @@ fit_regressions2 <- function(
 #' @param neural_networks_seed Seed for computational reproducibility when using neural networks. Passed from infinity_flow()
 #' @param verbose Verbosity
 #' @noRd
+#'
+
+library(parallel)
+library(pbapply)
+library(rhdf5)
+
 predict_from_models <- function(
     paths,
     prediction_events_downsampling,
@@ -480,7 +484,6 @@ predict_from_models <- function(
   h5write(preds, pred_h5_path, "/pred")
   
   saveRDS(pred_set,file=file.path(paths["rds"],"sampling_preds.Rds"))   
-  
   
   list(timings=timings)
   
